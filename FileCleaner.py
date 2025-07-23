@@ -1,6 +1,7 @@
 import os
 import glob
 import pandas as pd
+import sqlite3
 
 # Path to your CSV files
 csv_directory = 'C:\\College\\Masters Semster 5\\Privacy\\opensnp_datadump.current'
@@ -65,3 +66,5 @@ if all_data:
     print("Combined data saved to 'combined_output.csv'.")
 else:
     print("No valid data files were processed.")
+    
+    
