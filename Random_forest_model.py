@@ -12,29 +12,33 @@ import matplotlib.pyplot as plt
 #Display the first few rows to inspect the data
 ##print(dataOpenSNP.head()) blocked out until the data is available and file name can be entered
 
-# Function to load and preprocess the data set
-def load_data(file_path, target_column):
-    print("Loading dataset...")
-    # Load the dataset (replace with your actual OpenSNP data file)
-    data = pd.read_csv(file_path, low_memory=False)
-    print("Dataset loaded successfully.")
+# Function to load and preprocess the dataset in chunks
+def load_data(file_path, target_column, chunk_size=100000):
+    print("Loading dataset in chunks...")
+    chunk_iter = pd.read_csv(file_path, low_memory=False, chunksize=chunk_size)  # Read in chunks
+    data_list = []
     
-    # Select the genotype columns (X) and phenotype column (Y)
-    print(f"Selecting features and target columns...")
-    X = data.drop(target_column, axis=1)  # Genotype data (features)
-    Y = data[target_column]               # Phenotype data (target)
-    print("Features and target columns selected.")
-
-    # Handle missing values (e.g., drop rows with missing phenotype or genotype data)
-    print("Handling missing values...")
-    data = data.dropna()  # Alternatively, you can fill missing values if appropriate
-    print(f"Missing values handled. Data shape: {data.shape}")
-
-    return X, Y
+    # Iterate through each chunk
+    for chunk in chunk_iter:
+        print(f"Processing chunk with shape: {chunk.shape}")
+        
+        # Select the genotype columns (X) and phenotype column (Y)
+        X_chunk = chunk.drop(target_column, axis=1)  # Genotype data (features)
+        Y_chunk = chunk[target_column]               # Phenotype data (target)
+        
+        # Append the chunk data to the list
+        data_list.append((X_chunk, Y_chunk))
+        
+    # Concatenate all chunks into a final DataFrame
+    X_final = pd.concat([x for x, _ in data_list], axis=0)
+    Y_final = pd.concat([y for _, y in data_list], axis=0)
+    
+    print(f"Final data shape: X={X_final.shape}, Y={Y_final.shape}")
+    return X_final, Y_final
 
 # Function to train and evaluate the Random Forest model
-def train_and_evaluate(X, Y, model_type = 'regressor'):
-    print(f"Slitting data into training and testing sets...")
+def train_and_evaluate(X, Y, model_type='regressor'):
+    print(f"Splitting data into training and testing sets...")
     # Split the data into training and testing sets
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
     print(f"Data split was successful. Training set size: {X_train.shape[0]}, Testing set size: {X_test.shape[0]}")
@@ -94,9 +98,9 @@ def train_and_evaluate(X, Y, model_type = 'regressor'):
 if __name__ == "__main__":
     # Load the data
     print("Starting the data loading and preprocessing...")
-    file_path = r"G:/Shared drives/csds456/Project Midterm/combined_output.csv"  # Path to your CSV file
-    target_column = 'phenotype_column'  # Adjust to your actual phenotype column name
-    X, Y = load_data(file_path, 'phenotype_column')  # Pass the file path to the function
+    file_path = r"G:/Shared drives/csds456/Project Midterm/combined_output.csv"  
+    target_column = 'phenotype_column'  
+    X, Y = load_data(file_path, 'phenotype_column')  
 
     # Train and evaluate the model
     print("\nStarting the model training and evaluation...")
