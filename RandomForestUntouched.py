@@ -1,11 +1,13 @@
 import pandas as pd
 import csv
 from collections import defaultdict
+import tensorflow as tf
+import sklearn
 
 print("Checking genotypeHolder function")
 
-genotypesFile = "G:\\Shared drives\\csds456\\Project Midterm\\combined_output.csv" #wherever your genotypes file is located
-phenotypesFile = "G:\\Shared drives\\csds456\\Project Midterm\\phenotypes_202503091344.csv" #wherever your phenotypes file is located
+genotypesFile = "C:\\College\\Masters Semster 5\\Privacy\\opensnp_datadump.current\\combined_output.csv" #wherever your genotypes file is located
+phenotypesFile = "C:\\College\\Masters Semster 5\\Privacy\\Genotype-Phenotype-Project\\Data Samples\\phenotypes_202503091344.csv" #wherever your phenotypes file is located
 
 print("Importing genotypes and phenotypes...")
 
@@ -20,7 +22,9 @@ phenotypes = phenotypes[['user_id', 'genotype_filename', 'date_of_birth', 'chrom
                          'Welsh Ancestry', 'Caffeine dependence', 'Medium brown skin', 'Hazel Eyes', 'Extra Teeth', 'Eye Color - Heterochromia', 'Skin color.', 'Brown hair, Hazel, Caucasian.', 
                          'black hair and brown eyes, blood B+, 6,5 tall', 'blood compatibility for transfussion', 'Blue eyes', 'Eye', 'Skin color']]
 print("Created phenotypes dataframe with selected columns.")
+print(phenotypes.head(10))
 print("Cleaning up genotypes data efficiently...")
+print(genotypes.count(0))
 print(genotypes.head(10))
 # Pivot the genotypes DataFrame so that each Filename is a row, and all SNPs (rsid, chromosome, position, genotype) are columns.
 # We'll use a MultiIndex for columns: (rsid, chromosome, position, genotype)
@@ -31,5 +35,11 @@ genotypes_pivot = genotypes.pivot_table(
     aggfunc='first'
 )
 genotypes_pivot.reset_index(inplace=True)
+percent_kept = 0.4 #Percent of values that have to be non-NA for the column to be kept
+genotypes_pivot.dropna(axis=1, thresh=percent_kept * len(genotypes_pivot), inplace=True)  
+
+print("Genotypes data reshaped so each Filename is a row, retaining all SNP data.")
+print(f"Number of rows in genotypes_pivot: {len(genotypes_pivot)}")
+print(f"Number of columns in genotypes_pivot: {genotypes_pivot.shape[1]}")
 print(genotypes_pivot.head(100))
 print("Genotypes data reshaped so each Filename is a row, retaining all SNP data.")
