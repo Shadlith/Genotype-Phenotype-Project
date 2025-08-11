@@ -4,8 +4,8 @@ from collections import defaultdict
 
 print("Checking genotypeHolder function")
 
-genotypesFile = "C:\\College\\Masters Semster 5\\Privacy\\opensnp_datadump.current\\combined_output.csv" #wherever your genotypes file is located
-phenotypesFile = "C:\\College\\Masters Semster 5\\Privacy\\Genotype-Phenotype-Project\\Data Samples\\phenotypes_202503091344.csv" #wherever your phenotypes file is located
+genotypesFile = "G:\\Shared drives\\csds456\\Project Midterm\\combined_output.csv" #wherever your genotypes file is located
+phenotypesFile = "G:\\Shared drives\\csds456\\Project Midterm\\phenotypes_202503091344.csv" #wherever your phenotypes file is located
 
 print("Importing genotypes and phenotypes...")
 

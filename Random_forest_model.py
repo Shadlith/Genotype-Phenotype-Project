@@ -6,6 +6,8 @@ from sklearn.metrics import accuracy_score, mean_squared_error, classification_r
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
+import csv
+from collections import defaultdict
 
 # Function to load and preprocess the dataset
 def load_data(file_path, target_column):
@@ -24,13 +26,13 @@ def load_data(file_path, target_column):
     data = data.dropna()  # Alternatively, you can fill missing values if appropriate
     print(f"Missing values handled. Data shape: {data.shape}")
 
-    # Encoding categorical features (if any)
+    # Encoding categorical features
     print("\nEncoding categorical features...")
     for column in X.select_dtypes(include=['object']).columns:  # If columns are categorical
         X[column] = LabelEncoder().fit_transform(X[column])  # Convert strings to integers
     print("Categorical features encoded.")
     
-    # Encoding the target column (if necessary)
+    # Encoding the target column
     if Y.dtype == 'object':
         Y = LabelEncoder().fit_transform(Y)  # Encoding the phenotype target
         print(f"Phenotype column '{target_column}' encoded.")
