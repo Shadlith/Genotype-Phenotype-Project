@@ -3,6 +3,7 @@ import csv
 from collections import defaultdict
 import tensorflow as tf
 import sklearn
+import re
 
 print("Checking genotypeHolder function")
 
@@ -22,6 +23,15 @@ phenotypes = phenotypes[['user_id', 'genotype_filename', 'date_of_birth', 'chrom
                          'Welsh Ancestry', 'Caffeine dependence', 'Medium brown skin', 'Hazel Eyes', 'Extra Teeth', 'Eye Color - Heterochromia', 'Skin color.', 'Brown hair, Hazel, Caucasian.', 
                          'black hair and brown eyes, blood B+, 6,5 tall', 'blood compatibility for transfussion', 'Blue eyes', 'Eye', 'Skin color']]
 print("Created phenotypes dataframe with selected columns.")
+
+# Function to extract userX_fileY from genotype_filename in phenotypes
+def extract_user_file_from_phenotype(geno_filename):
+    match = re.match(r'(\d+)\.[^\.]*\.(\d+)', str(geno_filename))
+    if match:
+        return f"user{match.group(1)}_file{match.group(2)}"
+    return geno_filename
+
+phenotypes['genotype_filename'] = phenotypes['genotype_filename'].apply(extract_user_file_from_phenotype)
 print(phenotypes.head(10))
 print("Cleaning up genotypes data efficiently...")
 print(genotypes.count(0))
@@ -35,11 +45,21 @@ genotypes_pivot = genotypes.pivot_table(
     aggfunc='first'
 )
 genotypes_pivot.reset_index(inplace=True)
-percent_kept = 0.4 #Percent of values that have to be non-NA for the column to be kept
+percent_kept = 0.5 #Percent of values that have to be non-NA for the column to be kept
 genotypes_pivot.dropna(axis=1, thresh=percent_kept * len(genotypes_pivot), inplace=True)  
+# Function to extract userX_fileY from the genotypes_pivot index
+def extract_user_file(filename):
+    match = re.match(r'(user\d+_file\d+)', str(filename))
+    return match.group(1) if match else filename
+
+# Apply to genotypes_pivot['Filename']
+genotypes_pivot['Filename'] = genotypes_pivot['Filename'].apply(extract_user_file)
+
 
 print("Genotypes data reshaped so each Filename is a row, retaining all SNP data.")
 print(f"Number of rows in genotypes_pivot: {len(genotypes_pivot)}")
 print(f"Number of columns in genotypes_pivot: {genotypes_pivot.shape[1]}")
 print(genotypes_pivot.head(100))
 print("Genotypes data reshaped so each Filename is a row, retaining all SNP data.")
+
+merged_data = pd.merge(phenotypes, genotypes_pivot, left_on='genotype_filename', right_on='Filename', how='right')
