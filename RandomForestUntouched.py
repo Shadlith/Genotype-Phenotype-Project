@@ -38,9 +38,11 @@ print(genotypes.count(0))
 print(genotypes.head(10))
 # Pivot the genotypes DataFrame so that each Filename is a row, and all SNPs (rsid, chromosome, position, genotype) are columns.
 # We'll use a MultiIndex for columns: (rsid, chromosome, position, genotype)
+# Create a single-level column index by combining rsid, chromosome, and position into a tuple
+genotypes['snp_tuple'] = list(zip(genotypes['rsid'], genotypes['chromosome'], genotypes['position']))
 genotypes_pivot = genotypes.pivot_table(
     index='Filename',
-    columns=['rsid', 'chromosome', 'position'],
+    columns='snp_tuple',
     values='genotype',
     aggfunc='first'
 )
@@ -63,3 +65,7 @@ print(genotypes_pivot.head(100))
 print("Genotypes data reshaped so each Filename is a row, retaining all SNP data.")
 
 merged_data = pd.merge(phenotypes, genotypes_pivot, left_on='genotype_filename', right_on='Filename', how='right')
+print("Merged phenotypes and genotypes data successfully.")
+print(f"Number of rows in merged_data: {len(merged_data)}")
+print(merged_data.head(10))
+print(merged_data.columns)
