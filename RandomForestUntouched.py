@@ -114,12 +114,6 @@ def trainModel(data, isFile=True, phenotypeColumn='Eye color'):
     # Evaluate
     score = randomForest.score(X_test, Y_test)
     print(f"Random Forest accuracy: {score:.4f}")
-    
-    print(f"Missing values handled. Data shape: {data.shape}")
-    print("Encoding categorical features...")
-    
-    
-    
     print("Model training completed.")
 
 genotypesFile = "C:\\College\\Masters Semster 5\\Privacy\\opensnp_datadump.current\\combined_output.csv"
