@@ -77,7 +77,7 @@ def createMergedFile(genotypesFile, phenotypesFile, outputFile):
     
     return merged_data
     
-def trainModel(data, isFile=True, phenotypeColumn='Eye color'):
+def trainModel(data, isFile=True, phenotypeColumn='Eye color', MaskData=0):
     print("Training model...")
     randomForest = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42)
     if isFile:
@@ -107,6 +107,17 @@ def trainModel(data, isFile=True, phenotypeColumn='Eye color'):
         if not most_common.empty:
             data.fillna({col: most_common[0]}, inplace=True)
     print("Missing values handled.")
+    # if MaskData == 0, do nothing
+    if MaskData == 1:
+        print("Randomly masking 10% of genotype data...")
+        mask = np.random.rand(*X.shape) < 0.1
+        X = X.mask(mask)
+        print("Random masking complete.")
+    elif MaskData == 2:
+        
+        print("Specific masking complete.")
+    
+    
     # Encode categorical features
     for col in X.columns:
         if X[col].dtype == 'object':
@@ -154,4 +165,4 @@ genotypesFile = "C:\\College\\Masters Semster 5\\Privacy\\opensnp_datadump.curre
 phenotypesFile = "C:\\College\\Masters Semster 5\\Privacy\\Genotype-Phenotype-Project\\Data Samples\\phenotypes_202503091344.csv"
 outputFile = "merged_genotype_phenotype.csv"
 #createMergedFile(genotypesFile, phenotypesFile, outputFile)
-trainModel(outputFile, isFile=True, phenotypeColumn='Eye color')
+trainModel(outputFile, isFile=True, phenotypeColumn='Sex', MaskData=1)  # Change phenotypeColumn as needed
