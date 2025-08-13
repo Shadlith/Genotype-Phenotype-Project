@@ -1,3 +1,5 @@
+from matplotlib import pyplot as plt
+import numpy as np
 import pandas as pd
 import csv
 from collections import defaultdict
@@ -83,6 +85,17 @@ def trainModel(data, isFile=True, phenotypeColumn='Eye color'):
     else:
         data = data.copy()
     
+    print("Cleaning up data...")
+    collumnsToDrop = ['user_id', 'genotype_filename', 'Filename', 'date_of_birth', 'chrom_sex', 'Eye color', 'white skin', 'Beard Color', 'Hair Color', 'Sex',
+                            'ethnicity', 'Ancestry', 'Dyslexia', 'Jewish Ancestry', 'Birth year', 'Weight', 'Autism', 'eye colour', 'Black', 'Blood Type',
+                            'Favorite Color/Colour', 'black skin', 'dark Blonde', 'blood type', 'Skintype', 'Hair color', 'hair colour', 'Red Hair', 'african-northern european', 
+                            'brunette', 'Nationality', 'Hair colour', 'Eye Color', 'Physical', 'black', 'Alcoholism', 'Mother\'s eye color', 'Latino Ancestry', 'hair color', 'Scottish Ancestry',
+                            'Welsh Ancestry', 'Caffeine dependence', 'Medium brown skin', 'Hazel Eyes', 'Extra Teeth', 'Eye Color - Heterochromia', 'Skin color.', 'Brown hair, Hazel, Caucasian.', 
+                            'black hair and brown eyes, blood B+, 6,5 tall', 'blood compatibility for transfussion', 'Blue eyes', 'Eye', 'Skin color']
+    collumnsToDrop.remove(phenotypeColumn)  # Ensure the phenotype column is not dropped
+    data.drop(columns=collumnsToDrop, axis=1, inplace=True)
+    
+    print("Data cleaned up.")
     X = data.drop(phenotypeColumn, axis=1)  # Genotype data (features)
     Y = data[phenotypeColumn]               # Phenotype data (target)
     print("Features and target columns selected.") 
@@ -115,6 +128,25 @@ def trainModel(data, isFile=True, phenotypeColumn='Eye color'):
     score = randomForest.score(X_test, Y_test)
     print(f"Random Forest accuracy: {score:.4f}")
     print("Model training completed.")
+    
+    # Feature importance plot (matches the style of Code Block 2)
+    print("Calculating and plotting feature importances...")
+    importance = randomForest.feature_importances_
+    sorted_idx = np.argsort(importance)[::-1]
+    top_k = 10
+    top_idx = sorted_idx[:top_k]
+
+    # Use names if available; fall back to indices
+    feature_names = np.array(X.columns, dtype=object)
+    top_names = feature_names[top_idx]
+
+    plt.figure(figsize=(10, 6))
+    plt.barh(range(len(top_idx)), importance[top_idx], align='center')
+    plt.yticks(range(len(top_idx)), top_names)
+    plt.xlabel('Feature Importance')
+    plt.title(f'Top {top_k} Features for {phenotypeColumn} (Random Forest)')
+    plt.gca().invert_yaxis()  # Highest at top
+    plt.show()
 
 genotypesFile = "C:\\College\\Masters Semster 5\\Privacy\\opensnp_datadump.current\\combined_output.csv"
 phenotypesFile = "C:\\College\\Masters Semster 5\\Privacy\\Genotype-Phenotype-Project\\Data Samples\\phenotypes_202503091344.csv"
