@@ -91,7 +91,7 @@ def trainModel(data, isFile=True, phenotypeColumn='Eye color'):
                             'Favorite Color/Colour', 'black skin', 'dark Blonde', 'blood type', 'Skintype', 'Hair color', 'hair colour', 'Red Hair', 'african-northern european', 
                             'brunette', 'Nationality', 'Hair colour', 'Eye Color', 'Physical', 'black', 'Alcoholism', 'Mother\'s eye color', 'Latino Ancestry', 'hair color', 'Scottish Ancestry',
                             'Welsh Ancestry', 'Caffeine dependence', 'Medium brown skin', 'Hazel Eyes', 'Extra Teeth', 'Eye Color - Heterochromia', 'Skin color.', 'Brown hair, Hazel, Caucasian.', 
-                            'black hair and brown eyes, blood B+, 6,5 tall', 'blood compatibility for transfussion', 'Blue eyes', 'Eye', 'Skin color']
+                            'black hair and brown eyes, blood B+, 6,5 tall', 'blood compatibility for transfussion', 'Blue eyes', 'Eye', 'Skin color', '(\'RSID\', \'CHROMOSOME\', \'POSITION\')']
     collumnsToDrop.remove(phenotypeColumn)  # Ensure the phenotype column is not dropped
     data.drop(columns=collumnsToDrop, axis=1, inplace=True)
     
@@ -139,6 +139,8 @@ def trainModel(data, isFile=True, phenotypeColumn='Eye color'):
     # Use names if available; fall back to indices
     feature_names = np.array(X.columns, dtype=object)
     top_names = feature_names[top_idx]
+    print(f"Top {top_k} features for {phenotypeColumn}: {top_names} with values {importance[top_idx]}")
+    
 
     plt.figure(figsize=(10, 6))
     plt.barh(range(len(top_idx)), importance[top_idx], align='center')
